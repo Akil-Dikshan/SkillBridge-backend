@@ -1,0 +1,24 @@
+version: '3.8'
+
+# SkillBridge — Docker Compose
+# Runs all microservices + databases + RabbitMQ locally
+# Usage: docker-compose up
+
+services:
+
+  # ─────────────────────────────────────────
+  # PHASE 1 SERVICES
+  # ─────────────────────────────────────────
+
+  # api-gateway:        (added in SB-73)
+  # auth-service:       (added in SB-29)
+  # user-service:       (added in SB-44)
+  # booking-service:    (added in SB-61)
+
+  # ─────────────────────────────────────────
+  # PHASE 2 SERVICES
+  # ─────────────────────────────────────────
+
+  # notification-service: (added in SB-96)
+  # review-service:        (added in SB-108)
+  # rabbitmq:              (added in SB-96)
