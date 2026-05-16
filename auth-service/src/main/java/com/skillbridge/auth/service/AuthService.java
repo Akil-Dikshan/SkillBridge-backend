@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
+import com.skillbridge.auth.dto.RefreshTokenRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -107,5 +108,41 @@ public class AuthService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 not available", e);
         }
+    }
+    // Refresh Token
+    @Transactional
+    public AuthResponse refresh(RefreshTokenRequest request) {
+
+        String tokenHash = hashToken(request.getRefreshToken());
+
+        RefreshToken storedToken = refreshTokenRepository.findByTokenHash(tokenHash)
+                .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+
+        if (storedToken.isRevoked()) {
+            throw new BadCredentialsException("Refresh token has been revoked");
+        }
+
+        if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BadCredentialsException("Refresh token has expired");
+        }
+
+        User user = userRepository.findById(storedToken.getUserId())
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        // Rotate refresh token — revoke old, issue new
+        storedToken.setRevoked(true);
+        refreshTokenRepository.save(storedToken);
+
+        String newAccessToken  = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
+        String newRefreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        saveRefreshToken(user.getId(), newRefreshToken);
+
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .role(user.getRole().name())
+                .email(user.getEmail())
+                .build();
     }
 }
