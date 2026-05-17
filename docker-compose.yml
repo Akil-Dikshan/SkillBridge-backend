@@ -6,19 +6,49 @@ version: '3.8'
 
 services:
 
-  # ─────────────────────────────────────────
   # PHASE 1 SERVICES
-  # ─────────────────────────────────────────
 
-  # api-gateway:        (added in SB-73)
-  # auth-service:       (added in SB-29)
-  # user-service:       (added in SB-44)
-  # booking-service:    (added in SB-61)
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - skillbridge-network
 
-  # ─────────────────────────────────────────
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
+    depends_on:
+      - auth-db
+    networks:
+      - skillbridge-network
+
+
   # PHASE 2 SERVICES
-  # ─────────────────────────────────────────
 
   # notification-service: (added in SB-96)
   # review-service:        (added in SB-108)
   # rabbitmq:              (added in SB-96)
+
+volumes:
+  auth-db-data:
+
+networks:
+  skillbridge-network:
+    driver: bridge
