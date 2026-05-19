@@ -1,12 +1,6 @@
 version: '3.8'
 
-# SkillBridge — Docker Compose
-# Runs all microservices + databases + RabbitMQ locally
-# Usage: docker-compose up
-
 services:
-
-  # PHASE 1 SERVICES
 
   auth-db:
     image: postgres:15-alpine
@@ -39,15 +33,40 @@ services:
     networks:
       - skillbridge-network
 
+  user-db:
+    image: postgres:15-alpine
+    container_name: user-db
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - skillbridge-network
 
-  # PHASE 2 SERVICES
-
-  # notification-service: (added in SB-96)
-  # review-service:        (added in SB-108)
-  # rabbitmq:              (added in SB-96)
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/user_db
+    depends_on:
+      - user-db
+    networks:
+      - skillbridge-network
 
 volumes:
   auth-db-data:
+  user-db-data:
 
 networks:
   skillbridge-network:
