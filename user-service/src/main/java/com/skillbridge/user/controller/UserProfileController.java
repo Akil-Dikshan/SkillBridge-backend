@@ -1,5 +1,8 @@
 package com.skillbridge.user.controller;
-
+import com.skillbridge.user.dto.AvailabilityRequest;
+import com.skillbridge.user.dto.AvailabilityResponse;
+import com.skillbridge.user.service.MentorAvailabilityService;
+import java.util.List;
 import com.skillbridge.user.dto.*;
 import com.skillbridge.user.service.MentorProfileService;
 import com.skillbridge.user.service.UserProfileService;
@@ -9,11 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserProfileController {
 
+    private final MentorAvailabilityService availabilityService;
     private final UserProfileService userProfileService;
     private final MentorProfileService mentorProfileService;
 
@@ -60,5 +66,28 @@ public class UserProfileController {
             @PathVariable Long userId,
             @Valid @RequestBody UpdateMentorProfileRequest request) {
         return ResponseEntity.ok(mentorProfileService.updateMentorProfile(userId, request));
+    }
+
+    // Availability endpoints
+
+    @PostMapping("/{userId}/availability")
+    public ResponseEntity<AvailabilityResponse> addAvailability(
+            @PathVariable Long userId,
+            @Valid @RequestBody AvailabilityRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(availabilityService.addAvailability(userId, request));
+    }
+
+    @GetMapping("/{userId}/availability")
+    public ResponseEntity<List<AvailabilityResponse>> getAvailability(@PathVariable Long userId) {
+        return ResponseEntity.ok(availabilityService.getAvailability(userId));
+    }
+
+    @DeleteMapping("/{userId}/availability/{slotId}")
+    public ResponseEntity<Void> deleteAvailability(
+            @PathVariable Long userId,
+            @PathVariable Long slotId) {
+        availabilityService.deleteAvailability(userId, slotId);
+        return ResponseEntity.noContent().build();
     }
 }
