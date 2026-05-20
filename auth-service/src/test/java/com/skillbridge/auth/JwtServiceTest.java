@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtServiceTest {
 
@@ -26,7 +25,7 @@ class JwtServiceTest {
 
     @Test
     void generateAccessToken_returnsNonNullToken() {
-        String token = jwtService.generateAccessToken("test@skillbridge.com", "STUDENT");
+        String token = jwtService.generateAccessToken("test@skillbridge.com", "STUDENT", 1L);
         assertThat(token).isNotNull();
         assertThat(token.split("\\.")).hasSize(3);
     }
@@ -34,26 +33,26 @@ class JwtServiceTest {
     @Test
     void extractEmail_returnsCorrectEmail() {
         String email = "test@skillbridge.com";
-        String token = jwtService.generateAccessToken(email, "STUDENT");
+        String token = jwtService.generateAccessToken(email, "STUDENT", 1L);
         assertThat(jwtService.extractEmail(token)).isEqualTo(email);
     }
 
     @Test
     void extractRole_returnsCorrectRole() {
-        String token = jwtService.generateAccessToken("test@skillbridge.com", "MENTOR");
+        String token = jwtService.generateAccessToken("test@skillbridge.com", "MENTOR", 1L);
         assertThat(jwtService.extractRole(token)).isEqualTo("MENTOR");
     }
 
     @Test
     void isTokenValid_returnsTrueForValidToken() {
         String email = "test@skillbridge.com";
-        String token = jwtService.generateAccessToken(email, "STUDENT");
+        String token = jwtService.generateAccessToken(email, "STUDENT", 1L);
         assertThat(jwtService.isTokenValid(token, email)).isTrue();
     }
 
     @Test
     void isTokenValid_returnsFalseForWrongEmail() {
-        String token = jwtService.generateAccessToken("test@skillbridge.com", "STUDENT");
+        String token = jwtService.generateAccessToken("test@skillbridge.com", "STUDENT", 1L);
         assertThat(jwtService.isTokenValid(token, "other@skillbridge.com")).isFalse();
     }
 
