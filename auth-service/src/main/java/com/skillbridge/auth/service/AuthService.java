@@ -45,7 +45,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String accessToken  = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
         String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         saveRefreshToken(user.getId(), refreshToken);
@@ -72,7 +72,7 @@ public class AuthService {
         // Revoke all old refresh tokens for this user
         refreshTokenRepository.deleteAllByUserId(user.getId());
 
-        String accessToken  = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
         String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         saveRefreshToken(user.getId(), refreshToken);
@@ -133,7 +133,7 @@ public class AuthService {
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
 
-        String newAccessToken  = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
+        String newAccessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
         String newRefreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         saveRefreshToken(user.getId(), newRefreshToken);
