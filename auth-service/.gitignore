@@ -31,8 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Environment Variables — NEVER commit secrets ###
-.env
-.env.*
-*.env
