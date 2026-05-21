@@ -102,6 +102,25 @@ services:
     networks:
       - skillbridge-network
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      USER_SERVICE_URL: http://user-service:8082
+      BOOKING_SERVICE_URL: http://booking-service:8083
+    depends_on:
+      - auth-service
+      - user-service
+      - booking-service
+    networks:
+      - skillbridge-network
+
 volumes:
   auth-db-data:
   user-db-data:
