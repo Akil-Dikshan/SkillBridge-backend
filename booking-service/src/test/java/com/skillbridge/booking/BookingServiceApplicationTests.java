@@ -7,21 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest(properties =
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration"
-)
+@SpringBootTest(properties = {
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration",
+        "auth.service.url=http://localhost:8081",
+        "user.service.url=http://localhost:8082"
+})
 class BookingServiceApplicationTests {
 
-    // Mock Feign clients — no real HTTP calls during context load
     @MockitoBean
     UserServiceClient userServiceClient;
 
     @MockitoBean
     AuthServiceClient authServiceClient;
 
-    // Mock event publisher — excludes RabbitAutoConfiguration above means
-    // RabbitTemplate is not in context, so the real publisher cannot be wired.
-    // Mocking it here satisfies BookingService's dependency cleanly.
     @MockitoBean
     BookingEventPublisher bookingEventPublisher;
 
