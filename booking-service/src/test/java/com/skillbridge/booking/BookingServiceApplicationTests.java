@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest(properties = {
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration",
-        "auth.service.url=http://localhost:8081",
-        "user.service.url=http://localhost:8082"
-})
+@SpringBootTest
 class BookingServiceApplicationTests {
 
     @MockitoBean
