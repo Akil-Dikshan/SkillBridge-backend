@@ -2,6 +2,8 @@ package com.skillbridge.notification.consumer;
 
 import com.skillbridge.notification.config.RabbitMQConfig;
 import com.skillbridge.notification.event.BookingEventDto;
+import com.skillbridge.notification.service.EmailService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BookingConfirmedConsumer {
+
+    private final EmailService emailService;
 
     /**
      * Called once per booking.confirmed message.
@@ -30,7 +35,6 @@ public class BookingConfirmedConsumer {
         log.info("📬 Received booking.confirmed event — bookingId={} student={} mentor={}",
                 event.getBookingId(), event.getStudentEmail(), event.getMentorEmail());
 
-        // TODO SB-93: send confirmation email to student and mentor
-        // emailService.sendBookingConfirmation(event);
+        emailService.sendBookingConfirmation(event);
     }
 }
