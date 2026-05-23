@@ -1,4 +1,10 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  cloud:
+    openfeign:
+      lazy-attributes-resolution: true
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
@@ -17,3 +23,7 @@ jwt:
 user:
   service:
     url: http://localhost:8082
+
+auth:
+  service:
+    url: http://localhost:8081

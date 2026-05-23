@@ -1,18 +1,25 @@
 package com.skillbridge.booking;
 
+import com.skillbridge.booking.client.AuthServiceClient;
 import com.skillbridge.booking.client.UserServiceClient;
+import com.skillbridge.booking.event.BookingEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class BookingServiceApplicationTests {
 
-	@MockitoBean
-	UserServiceClient userServiceClient;
+    @MockitoBean
+    UserServiceClient userServiceClient;
 
-	@Test
-	void contextLoads() {
-	}
+    @MockitoBean
+    AuthServiceClient authServiceClient;
 
+    @MockitoBean
+    BookingEventPublisher bookingEventPublisher;
+
+    @Test
+    void contextLoads() {
+    }
 }
