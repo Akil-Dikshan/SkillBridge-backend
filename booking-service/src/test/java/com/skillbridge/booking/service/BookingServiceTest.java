@@ -1,10 +1,13 @@
 package com.skillbridge.booking.service;
 
+import com.skillbridge.booking.client.AuthServiceClient;
 import com.skillbridge.booking.client.UserServiceClient;
 import com.skillbridge.booking.client.dto.MentorProfileResponse;
+import com.skillbridge.booking.client.dto.UserEmailResponse;
 import com.skillbridge.booking.client.dto.UserProfileResponse;
 import com.skillbridge.booking.dto.BookingRequest;
 import com.skillbridge.booking.dto.BookingResponse;
+import com.skillbridge.booking.event.BookingEventPublisher;
 import com.skillbridge.booking.model.Booking;
 import com.skillbridge.booking.model.BookingStatus;
 import com.skillbridge.booking.repository.BookingRepository;
@@ -40,6 +43,12 @@ class BookingServiceTest {
     @Mock
     private UserServiceClient userServiceClient;
 
+    @Mock
+    private AuthServiceClient authServiceClient;
+
+    @Mock
+    private BookingEventPublisher bookingEventPublisher;
+
     @InjectMocks
     private BookingService bookingService;
 
@@ -74,6 +83,7 @@ class BookingServiceTest {
         when(bookingRepository.existsByMentorIdAndBookingDateAndStartTimeAndStatusIn(
                 anyLong(), any(), any(), anyList())).thenReturn(false);
         when(bookingRepository.save(any(Booking.class))).thenReturn(buildBooking());
+        when(authServiceClient.getUserById(anyLong())).thenReturn(new UserEmailResponse());
 
         BookingResponse response = bookingService.createBooking(buildRequest(), "token");
 
