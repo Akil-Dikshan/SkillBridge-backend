@@ -39,6 +39,10 @@ spring:
           starttls:
             enable: true
 
+notification:
+  mail:
+    from: ${MAIL_FROM:noreply@skillbridge.com}
+
 management:
   endpoint:
     health:

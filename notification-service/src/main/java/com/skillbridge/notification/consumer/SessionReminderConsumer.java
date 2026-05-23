@@ -2,6 +2,8 @@ package com.skillbridge.notification.consumer;
 
 import com.skillbridge.notification.config.RabbitMQConfig;
 import com.skillbridge.notification.event.BookingEventDto;
+import com.skillbridge.notification.service.EmailService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SessionReminderConsumer {
+
+    private final EmailService emailService;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_SESSION_REMINDER)
     public void handleSessionReminder(BookingEventDto event) {
@@ -26,7 +31,6 @@ public class SessionReminderConsumer {
                 event.getBookingId(), event.getStudentEmail(), event.getMentorEmail(),
                 event.getBookingDate(), event.getStartTime());
 
-        // TODO SB-93: send reminder email to student and mentor
-        // emailService.sendSessionReminder(event);
+        emailService.sendSessionReminder(event);
     }
 }
