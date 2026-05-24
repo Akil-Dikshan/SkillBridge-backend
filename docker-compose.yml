@@ -169,6 +169,41 @@ services:
     networks:
       - skillbridge-network
 
+  review-db:
+    image: postgres:15-alpine
+    container_name: review-db
+    environment:
+      POSTGRES_DB: review_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - review-db-data:/var/lib/postgresql/data
+    networks:
+      - skillbridge-network
+
+  review-service:
+    build:
+      context: ./review-service
+      dockerfile: Dockerfile
+    container_name: review-service
+    ports:
+      - "8085:8085"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://review-db:5432/review_db
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      USER_SERVICE_URL: http://user-service:8082
+    depends_on:
+      - review-db
+      - booking-service
+      - user-service
+    networks:
+      - skillbridge-network
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -181,10 +216,12 @@ services:
       AUTH_SERVICE_URL: http://auth-service:8081
       USER_SERVICE_URL: http://user-service:8082
       BOOKING_SERVICE_URL: http://booking-service:8083
+      REVIEW_SERVICE_URL: http://review-service:8085
     depends_on:
       - auth-service
       - user-service
       - booking-service
+      - review-service
     networks:
       - skillbridge-network
 
@@ -194,6 +231,7 @@ volumes:
   booking-db-data:
   notification-db-data:
   rabbitmq-data:
+  review-db-data:
 
 networks:
   skillbridge-network:

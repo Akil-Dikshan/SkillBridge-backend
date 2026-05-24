@@ -29,6 +29,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
+                        // Internal endpoint for review-service Feign calls — no JWT required.
+                        // Not exposed via API Gateway, only reachable within Docker network.
+                        .requestMatchers("/api/users/internal/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

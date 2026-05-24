@@ -100,7 +100,7 @@ public class EmailService {
                     .status(NotificationStatus.SENT)
                     .build());
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error("❌ Email failed    → to={} subject={} error={}", to, subject, e.getMessage());
 
             notificationLogRepository.save(NotificationLog.builder()

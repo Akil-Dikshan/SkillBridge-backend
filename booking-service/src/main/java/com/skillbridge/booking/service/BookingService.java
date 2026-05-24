@@ -111,6 +111,16 @@ public class BookingService {
         return toResponse(updated);
     }
 
+    /**
+     * Returns a booking by ID for internal Feign calls from review-service.
+     * Used to verify booking status is COMPLETED before accepting a review.
+     */
+    public BookingResponse getBookingById(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found with id: " + bookingId));
+        return toResponse(booking);
+    }
+
     // ─── Private Helpers ──────────────────────────────────────────────────────
 
     private void publishConfirmedEvent(Booking booking) {

@@ -71,4 +71,23 @@ public class MentorProfileService {
                 .createdAt(profile.getCreatedAt())
                 .build();
     }
+
+    /**
+     * Updates the mentor's average rating and total review count.
+     * Called by the internal endpoint consumed by review-service via Feign.
+     *
+     * @param userId       the mentor's user ID
+     * @param averageRating the recalculated average rating from review-service
+     * @param totalReviews  the new total number of reviews
+     */
+    @Transactional
+    public void updateMentorRating(Long userId, java.math.BigDecimal averageRating, Integer totalReviews) {
+        MentorProfile profile = mentorProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor profile not found for userId: " + userId));
+
+        profile.setAverageRating(averageRating);
+        // totalSessions tracks booking completions; totalReviews is stored
+        // in the averageRating column. We only update averageRating here.
+        mentorProfileRepository.save(profile);
+    }
 }

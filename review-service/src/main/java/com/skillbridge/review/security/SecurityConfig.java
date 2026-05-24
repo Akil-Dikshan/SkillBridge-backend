@@ -1,10 +1,12 @@
-package com.skillbridge.booking.security;
+package com.skillbridge.review.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,14 +21,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
-                        // Internal endpoint for review-service Feign calls — no JWT required.
-                        // Not exposed via API Gateway, only reachable within Docker network.
-                        .requestMatchers("/api/bookings/internal/**").permitAll()
+                        // Only students can submit reviews
+                        .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("STUDENT")
+                        // Any authenticated user can view reviews
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/mentor/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
