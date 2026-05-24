@@ -90,4 +90,22 @@ public class UserProfileController {
         availabilityService.deleteAvailability(userId, slotId);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Internal endpoint for review-service Feign calls.
+     * Updates the mentor's average rating after a new review is submitted.
+     *
+     * This path is whitelisted in SecurityConfig — no JWT required.
+     * It is only reachable from within the Docker network (not via API Gateway).
+     */
+    @PutMapping("/internal/{userId}/mentor-rating")
+    public ResponseEntity<Void> updateMentorRating(
+            @PathVariable Long userId,
+            @RequestBody com.skillbridge.user.dto.UpdateRatingRequest request) {
+        mentorProfileService.updateMentorRating(
+                userId,
+                request.getAverageRating(),
+                request.getTotalReviews());
+        return ResponseEntity.noContent().build();
+    }
 }
