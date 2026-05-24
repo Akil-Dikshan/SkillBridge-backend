@@ -22,3 +22,10 @@ spring:
 notification:
   mail:
     from: noreply@test.skillbridge.com
+
+management:
+  health:
+    mail:
+      enabled: false
+    rabbit:
+      enabled: false
