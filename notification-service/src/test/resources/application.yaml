@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+
+  mail:
+    host: localhost
+    port: 1025
+
+notification:
+  mail:
+    from: noreply@test.skillbridge.com
+
+management:
+  health:
+    mail:
+      enabled: false
+    rabbit:
+      enabled: false

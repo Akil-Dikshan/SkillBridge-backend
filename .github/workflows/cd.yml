@@ -25,3 +25,11 @@ jobs:
       - name: Deploy booking-service
         run: |
           curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BOOKING }}"
+
+      - name: Deploy notification-service
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_NOTIFICATION }}"
+
+      - name: Deploy review-service
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_REVIEW }}"

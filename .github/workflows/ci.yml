@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [auth-service, user-service, booking-service, api-gateway]
+        service: [auth-service, user-service, booking-service, notification-service, review-service, api-gateway]
 
     steps:
       - uses: actions/checkout@v3
