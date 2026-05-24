@@ -7,10 +7,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        excludeAutoConfiguration = RabbitAutoConfiguration.class
-)
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@EnableAutoConfiguration(exclude = RabbitAutoConfiguration.class)
 @ActiveProfiles("test")
 class NotificationServiceApplicationTests {
 
