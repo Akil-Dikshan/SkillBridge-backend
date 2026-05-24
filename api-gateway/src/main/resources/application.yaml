@@ -22,6 +22,11 @@ spring:
           predicates:
             - Path=/api/bookings/**
 
+        - id: review-service-route
+          uri: ${REVIEW_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/reviews/**
+
       globalcors:
         cors-configurations:
           '[/**]':
@@ -49,3 +54,5 @@ services:
     url: ${USER_SERVICE_URL:http://localhost:8082}
   booking-service:
     url: ${BOOKING_SERVICE_URL:http://localhost:8083}
+  review-service:
+    url: ${REVIEW_SERVICE_URL:http://localhost:8085}
