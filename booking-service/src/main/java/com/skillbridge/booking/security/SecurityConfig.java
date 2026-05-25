@@ -24,8 +24,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
-                        // Internal endpoint for review-service Feign calls — no JWT required.
-                        // Not exposed via API Gateway, only reachable within Docker network.
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/bookings/internal/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
