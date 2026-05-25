@@ -48,4 +48,18 @@ public class BookingController {
         String token = authHeader.substring(7);
         return ResponseEntity.ok(bookingService.updateStatus(id, status, token));
     }
+
+    /**
+     * Internal endpoint for review-service Feign calls.
+     * Returns booking details (id, studentId, mentorId, status) so review-service
+     * can verify a booking is COMPLETED before accepting a review.
+     *
+     * This path is whitelisted in SecurityConfig — no JWT required.
+     * It is only reachable from within the Docker network (not via API Gateway).
+     */
+    @GetMapping("/internal/{bookingId}")
+    public ResponseEntity<BookingResponse> getBookingInternal(
+            @PathVariable Long bookingId) {
+        return ResponseEntity.ok(bookingService.getBookingById(bookingId));
+    }
 }

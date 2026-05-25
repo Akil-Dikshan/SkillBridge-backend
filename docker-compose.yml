@@ -67,6 +67,7 @@ services:
       - user-db
     networks:
       - skillbridge-network
+
   booking-db:
     image: postgres:15-alpine
     container_name: booking-db
@@ -97,8 +98,109 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
       - booking-db
+      - rabbitmq
+    networks:
+      - skillbridge-network
+
+  notification-db:
+    image: postgres:15-alpine
+    container_name: notification-db
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+    networks:
+      - skillbridge-network
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - skillbridge-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notification_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      MAIL_HOST: ${MAIL_HOST:mailhog}
+      MAIL_PORT: ${MAIL_PORT:1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:}
+      MAIL_FROM: ${MAIL_FROM:noreply@skillbridge.com}
+    depends_on:
+      - notification-db
+      - rabbitmq
+      - mailhog
+    networks:
+      - skillbridge-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - skillbridge-network
+
+  review-db:
+    image: postgres:15-alpine
+    container_name: review-db
+    environment:
+      POSTGRES_DB: review_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - review-db-data:/var/lib/postgresql/data
+    networks:
+      - skillbridge-network
+
+  review-service:
+    build:
+      context: ./review-service
+      dockerfile: Dockerfile
+    container_name: review-service
+    ports:
+      - "8085:8085"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://review-db:5432/review_db
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      USER_SERVICE_URL: http://user-service:8082
+    depends_on:
+      - review-db
+      - booking-service
+      - user-service
     networks:
       - skillbridge-network
 
@@ -114,10 +216,12 @@ services:
       AUTH_SERVICE_URL: http://auth-service:8081
       USER_SERVICE_URL: http://user-service:8082
       BOOKING_SERVICE_URL: http://booking-service:8083
+      REVIEW_SERVICE_URL: http://review-service:8085
     depends_on:
       - auth-service
       - user-service
       - booking-service
+      - review-service
     networks:
       - skillbridge-network
 
@@ -125,6 +229,9 @@ volumes:
   auth-db-data:
   user-db-data:
   booking-db-data:
+  notification-db-data:
+  rabbitmq-data:
+  review-db-data:
 
 networks:
   skillbridge-network:

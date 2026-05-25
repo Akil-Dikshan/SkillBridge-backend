@@ -27,7 +27,7 @@ public class RateLimitingFilter implements GlobalFilter, Ordered {
                 : "unknown";
 
         long now = Instant.now().getEpochSecond();
-        long start = windowStart.getOrDefault(clientIp, now);
+        long start = windowStart.getOrDefault(clientIp, 0L);
 
         if (now > start) {
             windowStart.put(clientIp, now);
