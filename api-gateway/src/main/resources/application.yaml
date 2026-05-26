@@ -33,6 +33,7 @@ spring:
             allowedOrigins:
               - "http://localhost:3000"
               - "https://skillbridge-frontend-eight.vercel.app"
+              - "https://skillbridge-official.vercel.app"
             allowedMethods:
               - GET
               - POST
