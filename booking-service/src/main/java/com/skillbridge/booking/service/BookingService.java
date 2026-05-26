@@ -33,17 +33,17 @@ public class BookingService {
     public BookingResponse createBooking(BookingRequest request, String token) {
         Long studentId = jwtService.extractUserId(token);
 
-        // Verify student profile exists in user-service
+        // Verify student profile exists in user-service (optional)
         try {
             userServiceClient.getUserProfile(studentId);
-        } catch (FeignException.NotFound e) {
-            throw new RuntimeException("Student not found with id: " + studentId);
+        } catch (FeignException e) {
+            log.warn("Student profile not found or error: " + studentId);
         }
 
         // Verify mentor profile exists in user-service
         try {
             userServiceClient.getMentorProfile(request.getMentorId());
-        } catch (FeignException.NotFound e) {
+        } catch (FeignException e) {
             throw new RuntimeException("Mentor not found with id: " + request.getMentorId());
         }
 
