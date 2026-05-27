@@ -94,13 +94,21 @@ class BookingServiceTest {
     }
 
     @Test
-    void createBooking_throwsWhenStudentNotFound() {
+    void createBooking_continuesWhenStudentProfileNotFound() {
+        // Student is authenticated via JWT so they exist in auth-service.
+        // A missing user-service profile is non-fatal — the booking still proceeds.
         when(jwtService.extractUserId("token")).thenReturn(1L);
         when(userServiceClient.getUserProfile(1L)).thenThrow(FeignException.NotFound.class);
+        when(userServiceClient.getMentorProfile(2L)).thenReturn(new MentorProfileResponse());
+        when(bookingRepository.existsByMentorIdAndBookingDateAndStartTimeAndStatusIn(
+                anyLong(), any(), any(), anyList())).thenReturn(false);
+        when(bookingRepository.save(any(Booking.class))).thenReturn(buildBooking());
+        when(authServiceClient.getUserById(anyLong())).thenReturn(new UserEmailResponse());
 
-        assertThatThrownBy(() -> bookingService.createBooking(buildRequest(), "token"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Student not found");
+        BookingResponse response = bookingService.createBooking(buildRequest(), "token");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStudentId()).isEqualTo(1L);
     }
 
     @Test
