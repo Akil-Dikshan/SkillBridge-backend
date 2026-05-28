@@ -30,7 +30,7 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @Column(name = "profile_picture_url")
+    @Column(name = "profile_picture_url", columnDefinition = "TEXT")
     private String profilePictureUrl;
 
     @Enumerated(EnumType.STRING)
