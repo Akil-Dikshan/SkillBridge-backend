@@ -5,6 +5,7 @@ import com.skillbridge.user.service.MentorAvailabilityService;
 import java.util.List;
 import com.skillbridge.user.dto.*;
 import com.skillbridge.user.service.MentorProfileService;
+import com.skillbridge.user.service.ResumeService;
 import com.skillbridge.user.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UserProfileController {
     private final MentorAvailabilityService availabilityService;
     private final UserProfileService userProfileService;
     private final MentorProfileService mentorProfileService;
+    private final ResumeService resumeService;
 
     // User profile endpoints
 
@@ -88,6 +90,52 @@ public class UserProfileController {
             @PathVariable Long userId,
             @PathVariable Long slotId) {
         availabilityService.deleteAvailability(userId, slotId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Work Experience endpoints
+
+    @PostMapping("/{userId}/work-experience")
+    public ResponseEntity<WorkExperienceResponse> addWorkExperience(
+            @PathVariable Long userId,
+            @Valid @RequestBody WorkExperienceRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(resumeService.addWorkExperience(userId, request));
+    }
+
+    @GetMapping("/{userId}/work-experience")
+    public ResponseEntity<List<WorkExperienceResponse>> getWorkExperience(@PathVariable Long userId) {
+        return ResponseEntity.ok(resumeService.getWorkExperience(userId));
+    }
+
+    @DeleteMapping("/{userId}/work-experience/{entryId}")
+    public ResponseEntity<Void> deleteWorkExperience(
+            @PathVariable Long userId,
+            @PathVariable Long entryId) {
+        resumeService.deleteWorkExperience(userId, entryId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Education endpoints
+
+    @PostMapping("/{userId}/education")
+    public ResponseEntity<EducationResponse> addEducation(
+            @PathVariable Long userId,
+            @Valid @RequestBody EducationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(resumeService.addEducation(userId, request));
+    }
+
+    @GetMapping("/{userId}/education")
+    public ResponseEntity<List<EducationResponse>> getEducation(@PathVariable Long userId) {
+        return ResponseEntity.ok(resumeService.getEducation(userId));
+    }
+
+    @DeleteMapping("/{userId}/education/{entryId}")
+    public ResponseEntity<Void> deleteEducation(
+            @PathVariable Long userId,
+            @PathVariable Long entryId) {
+        resumeService.deleteEducation(userId, entryId);
         return ResponseEntity.noContent().build();
     }
 
