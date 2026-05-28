@@ -17,6 +17,11 @@ spring:
           predicates:
             - Path=/api/users/**
 
+        - id: mentor-search-route
+          uri: ${USER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/mentors/**
+
         - id: booking-service-route
           uri: ${BOOKING_SERVICE_URL:http://localhost:8083}
           predicates:
@@ -33,6 +38,7 @@ spring:
             allowedOrigins:
               - "http://localhost:3000"
               - "http://localhost:5173"
+              - "http://localhost:5174"
               - "https://skillbridge-frontend-eight.vercel.app"
             allowedMethods:
               - GET
