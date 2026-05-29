@@ -8,31 +8,38 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
 
-    //  Create profile
+    //  Create or update profile (upsert — safe to call multiple times)
     @Transactional
     public UserProfileResponse createProfile(Long userId, String role, CreateProfileRequest request) {
 
-        if (userProfileRepository.existsByUserId(userId)) {
-            throw new IllegalArgumentException("Profile already exists for this user");
+        Optional<UserProfile> existing = userProfileRepository.findByUserId(userId);
+
+        UserProfile profile;
+        if (existing.isPresent()) {
+            profile = existing.get();
+            if (request.getFirstName() != null) profile.setFirstName(request.getFirstName());
+            if (request.getLastName()  != null) profile.setLastName(request.getLastName());
+            if (request.getBio()       != null) profile.setBio(request.getBio());
+        } else {
+            profile = UserProfile.builder()
+                    .userId(userId)
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .bio(request.getBio())
+                    .profilePictureUrl(request.getProfilePictureUrl())
+                    .role(Role.valueOf(role))
+                    .build();
         }
 
-        UserProfile profile = UserProfile.builder()
-                .userId(userId)
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .bio(request.getBio())
-                .profilePictureUrl(request.getProfilePictureUrl())
-                .role(Role.valueOf(role))
-                .build();
-
         userProfileRepository.save(profile);
-
         return toResponse(profile);
     }
 

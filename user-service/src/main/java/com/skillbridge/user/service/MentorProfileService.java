@@ -13,23 +13,19 @@ public class MentorProfileService {
 
     private final MentorProfileRepository mentorProfileRepository;
 
-    //  Create mentor profile
+    //  Create or update mentor profile (upsert — safe to call multiple times)
     @Transactional
     public MentorProfileResponse createMentorProfile(Long userId, CreateMentorProfileRequest request) {
 
-        if (mentorProfileRepository.existsByUserId(userId)) {
-            throw new IllegalArgumentException("Mentor profile already exists for this user");
-        }
+        MentorProfile profile = mentorProfileRepository.findByUserId(userId).orElse(
+                MentorProfile.builder().userId(userId).build()
+        );
 
-        MentorProfile profile = MentorProfile.builder()
-                .userId(userId)
-                .skills(request.getSkills())
-                .hourlyRate(request.getHourlyRate())
-                .yearsOfExperience(request.getYearsOfExperience())
-                .build();
+        if (request.getSkills()            != null) profile.setSkills(request.getSkills());
+        if (request.getHourlyRate()        != null) profile.setHourlyRate(request.getHourlyRate());
+        if (request.getYearsOfExperience() != null) profile.setYearsOfExperience(request.getYearsOfExperience());
 
         mentorProfileRepository.save(profile);
-
         return toResponse(profile);
     }
 
