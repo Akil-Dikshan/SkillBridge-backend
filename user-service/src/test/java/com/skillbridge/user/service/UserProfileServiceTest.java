@@ -29,8 +29,8 @@ class UserProfileServiceTest {
     private UserProfileService userProfileService;
 
     @Test
-    void createProfile_success() {
-        when(userProfileRepository.existsByUserId(1L)).thenReturn(false);
+    void createProfile_createsNewProfile() {
+        when(userProfileRepository.findByUserId(1L)).thenReturn(Optional.empty());
         when(userProfileRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         CreateProfileRequest request = new CreateProfileRequest();
@@ -46,16 +46,28 @@ class UserProfileServiceTest {
     }
 
     @Test
-    void createProfile_throwsIfAlreadyExists() {
-        when(userProfileRepository.existsByUserId(1L)).thenReturn(true);
+    void createProfile_updatesExistingProfile() {
+        UserProfile existing = UserProfile.builder()
+                .id(1L)
+                .userId(1L)
+                .firstName("Old")
+                .lastName("Name")
+                .role(Role.MENTOR)
+                .build();
+
+        when(userProfileRepository.findByUserId(1L)).thenReturn(Optional.of(existing));
+        when(userProfileRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         CreateProfileRequest request = new CreateProfileRequest();
-        request.setFirstName("John");
-        request.setLastName("Doe");
+        request.setFirstName("New");
+        request.setLastName("Name");
+        request.setBio("Updated bio");
 
-        assertThatThrownBy(() -> userProfileService.createProfile(1L, "STUDENT", request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Profile already exists for this user");
+        UserProfileResponse response = userProfileService.createProfile(1L, "MENTOR", request);
+
+        assertThat(response.getFirstName()).isEqualTo("New");
+        assertThat(response.getBio()).isEqualTo("Updated bio");
+        assertThat(response.getRole()).isEqualTo("MENTOR");
     }
 
     @Test
