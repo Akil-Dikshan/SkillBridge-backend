@@ -26,6 +26,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/api/auth/refresh"
     );
 
+    private static final List<String> PUBLIC_PREFIXES = List.of(
+            "/api/mentors"
+    );
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
@@ -52,7 +56,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicPath(String path) {
-        return PUBLIC_PATHS.stream().anyMatch(path::equals);
+        return PUBLIC_PATHS.stream().anyMatch(path::equals)
+                || PUBLIC_PREFIXES.stream().anyMatch(path::startsWith);
     }
 
     @Override
