@@ -34,6 +34,10 @@ public class SecurityConfig {
                         // Public mentor search and profile browsing — no login required.
                         .requestMatchers("/api/mentors/**").permitAll()
                         .requestMatchers("/api/users/*/mentor-profile").permitAll()
+                        .requestMatchers("/api/users/*/profile").permitAll()
+                        .requestMatchers("/api/users/*/availability").permitAll()
+                        .requestMatchers("/api/users/*/work-experience").permitAll()
+                        .requestMatchers("/api/users/*/education").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
