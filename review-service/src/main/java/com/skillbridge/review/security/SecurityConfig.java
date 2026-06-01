@@ -28,8 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         // Only students can submit reviews
                         .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("STUDENT")
-                        // Any authenticated user can view reviews
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/mentor/**").authenticated()
+                        // Mentor reviews are public — no login required to browse
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/mentor/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
