@@ -30,6 +30,18 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/api/mentors"
     );
 
+    private static final List<String> PUBLIC_SUFFIXES = List.of(
+            "/mentor-profile",
+            "/availability",
+            "/work-experience",
+            "/education"
+    );
+
+    // Public regex-style patterns for mentor profile viewing
+    private static final List<String> PUBLIC_REVIEW_PREFIXES = List.of(
+            "/api/reviews/mentor/"
+    );
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
@@ -57,7 +69,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream().anyMatch(path::equals)
-                || PUBLIC_PREFIXES.stream().anyMatch(path::startsWith);
+                || PUBLIC_PREFIXES.stream().anyMatch(path::startsWith)
+                || PUBLIC_SUFFIXES.stream().anyMatch(path::endsWith)
+                || PUBLIC_REVIEW_PREFIXES.stream().anyMatch(path::startsWith);
     }
 
     @Override
