@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/mentor-profile",
             "/availability",
             "/work-experience",
-            "/education"
+            "/education",
+            "/profile"
     );
 
     // Public regex-style patterns for mentor profile viewing
