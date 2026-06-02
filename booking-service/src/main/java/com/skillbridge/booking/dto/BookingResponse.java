@@ -23,4 +23,6 @@ public class BookingResponse {
     private BookingStatus status;
     private String notes;
     private LocalDateTime createdAt;
+    private String mentorName;
+    private String studentName;
 }

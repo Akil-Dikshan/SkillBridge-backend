@@ -182,6 +182,17 @@ public class BookingService {
     }
 
     private BookingResponse toResponse(Booking booking) {
+        String mentorName = null;
+        String studentName = null;
+        try {
+            var mp = userServiceClient.getUserProfile(booking.getMentorId());
+            if (mp != null) mentorName = trim(mp.getFirstName(), mp.getLastName());
+        } catch (Exception ignored) {}
+        try {
+            var sp = userServiceClient.getUserProfile(booking.getStudentId());
+            if (sp != null) studentName = trim(sp.getFirstName(), sp.getLastName());
+        } catch (Exception ignored) {}
+
         return BookingResponse.builder()
                 .id(booking.getId())
                 .studentId(booking.getStudentId())
@@ -192,6 +203,13 @@ public class BookingService {
                 .status(booking.getStatus())
                 .notes(booking.getNotes())
                 .createdAt(booking.getCreatedAt())
+                .mentorName(mentorName)
+                .studentName(studentName)
                 .build();
+    }
+
+    private String trim(String first, String last) {
+        String name = ((first != null ? first : "") + " " + (last != null ? last : "")).trim();
+        return name.isEmpty() ? null : name;
     }
 }
